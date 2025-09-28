@@ -1,0 +1,33 @@
+{
+  "activeProjects": 2,
+  "carbonCredits": 1301,
+  "mangroveArea": 125,
+  "communityImpact": 3,
+  "projects": [
+    { "id": 1, "name": "Mangrove Restoration", "status": "Active", "credits": 850 },
+    { "id": 2, "name": "Plastic Cleanup", "status": "Active", "credits": 451 }
+  ],
+  "transactions": [
+    { "id": 101, "type": "Credit Issuance", "credits": 120, "block": "ab184a0fa", "date": "2025-09-20" },
+    { "id": 102, "type": "Tree Planting", "credits": 90, "block": "b9183f012", "date": "2025-09-15" }
+  ],
+  "monitoring": {
+    "treesPlanted": 5000,
+    "co2Absorbed": 1301,
+    "creditsEarned": 1301,
+    "sensorReadings": [
+      { "site": "Site A", "ph": 7.1, "salinity": 0.35 },
+      { "site": "Site B", "ph": 6.8, "salinity": 0.40 }
+    ]
+  },
+  "admin": {
+    "users": [
+      { "id": 1, "name": "Admin User", "role": "Super Admin" },
+      { "id": 2, "name": "Project Manager", "role": "Manager" }
+    ],
+    "settings": {
+      "platformName": "CarbonX",
+      "version": "1.0.0"
+    }
+  }
+}

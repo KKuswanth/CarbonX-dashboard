@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CarbonX Marketplace</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <div class="container my-5">
+
+    <!-- Title -->
+    <h4 class="fw-bold mb-2"><i class="bi bi-shop"></i> Carbon Credit Marketplace</h4>
+    <p class="text-muted mb-4">Buy and sell verified carbon credits from mangrove restoration projects</p>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card stat-card">
+          <div id="currentPrice" class="stat-value">₹24.50</div>
+          <div class="stat-change"><i class="bi bi-cash-coin"></i> Current Price <span class="positive">+5.2%</span></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card">
+          <div id="volume24h" class="stat-value">12,847</div>
+          <div class="stat-change"><i class="bi bi-bar-chart-line"></i> 24h Volume <span class="positive">+12%</span></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card">
+          <div id="availableCredits" class="stat-value">0</div>
+          <div class="stat-change"><i class="bi bi-activity"></i> Available Credits <span class="negative">-2.1%</span></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card">
+          <div id="marketCap" class="stat-value">₹0.0M</div>
+          <div class="stat-change"><i class="bi bi-bank"></i> Market Cap <span class="negative">-1.8%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Credits -->
+    <div class="card p-4 mb-4">
+      <h6 class="fw-bold mb-3"><i class="bi bi-list-check"></i> Available Credits</h6>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sundarbans Delta <br><small class="text-success"><i class="bi bi-patch-check-fill"></i> Verified • 2024</small></td>
+            <td>500</td>
+            <td>₹24.5</td>
+            <td>₹12,250</td>
+            <td><button class="btn btn-success btn-lg"><i class="bi bi-cart-check"></i> Buy</button></td>
+          </tr>
+          <tr>
+            <td>Kerala Backwaters <br><small class="text-success"><i class="bi bi-patch-check-fill"></i> Verified • 2024</small></td>
+            <td>250</td>
+            <td>₹25</td>
+            <td>₹6,250</td>
+            <td><button class="btn btn-success btn-lg"><i class="bi bi-cart-check"></i> Buy</button></td>
+          </tr>
+          <tr>
+            <td>Goa Coastal <br><small class="text-muted"><i class="bi bi-hourglass-split"></i> Pending • 2024</small></td>
+            <td>1000</td>
+            <td>₹23.75</td>
+            <td>₹23,750</td>
+            <td><button class="btn btn-secondary btn-lg" disabled><i class="bi bi-hourglass-split"></i> Pending</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Quick Trade -->
+    <div class="card p-4">
+      <h6 class="fw-bold mb-3"><i class="bi bi-lightning-charge"></i> Quick Trade</h6>
+
+      <!-- Tabs -->
+      <div class="d-flex gap-2 mb-4">
+        <button class="btn btn-outline-success tab-btn active w-50" id="buyTab"><i class="bi bi-cart"></i> Buy</button>
+        <button class="btn btn-outline-success tab-btn w-50" id="sellTab"><i class="bi bi-arrow-up-right-circle"></i> Sell</button>
+      </div>
+
+      <!-- Form -->
+      <form id="marketForm" class="form-section">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Project</label>
+          <select class="form-select" id="projectName" required>
+            <option value="">Select Project</option>
+            <option value="24.5">Sundarbans Delta</option>
+            <option value="25">Kerala Backwaters</option>
+            <option value="23.75">Goa Coastal</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Quantity</label>
+          <input type="number" class="form-control" id="credits" placeholder="Enter credits" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Price per Credit (₹)</label>
+          <input type="number" step="0.01" class="form-control" id="price" value="24.50" required>
+        </div>
+        <div class="mb-3">
+          <p><strong>Total Amount:</strong> ₹<span id="totalAmount">0.00</span></p>
+          <p><strong>Transaction Fee:</strong> ₹<span id="transactionFee">0.00</span></p>
+        </div>
+        <button type="submit" class="btn btn-success w-100 fs-5 py-2" id="submitBtn"><i class="bi bi-credit-card"></i> Place Buy Order</button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const buyTab = document.getElementById("buyTab");
+    const sellTab = document.getElementById("sellTab");
+    const submitBtn = document.getElementById("submitBtn");
+    const creditsInput = document.getElementById("credits");
+    const priceInput = document.getElementById("price");
+    const totalAmount = document.getElementById("totalAmount");
+    const transactionFee = document.getElementById("transactionFee");
+    const currentPrice = document.getElementById("currentPrice");
+    const volume24h = document.getElementById("volume24h");
+    const marketCap = document.getElementById("marketCap");
+    const projectSelect = document.getElementById("projectName");
+
+    let marketCapValue = 0;
+    let volumeValue = 12847;
+
+    // Toggle Buy/Sell Tabs
+    buyTab.addEventListener("click", () => {
+      buyTab.classList.add("active");
+      sellTab.classList.remove("active");
+      submitBtn.innerHTML = '<i class="bi bi-credit-card"></i> Place Buy Order';
+      submitBtn.classList.remove("btn-danger");
+      submitBtn.classList.add("btn-success");
+    });
+
+    sellTab.addEventListener("click", () => {
+      sellTab.classList.add("active");
+      buyTab.classList.remove("active");
+      submitBtn.innerHTML = '<i class="bi bi-credit-card"></i> Place Sell Order';
+      submitBtn.classList.remove("btn-success");
+      submitBtn.classList.add("btn-danger");
+    });
+
+    // Auto calculate total + fee
+    function calculate() {
+      const credits = parseFloat(creditsInput.value) || 0;
+      const price = parseFloat(priceInput.value) || 0;
+      const total = credits * price;
+      const fee = total * 0.02; // 2% fee
+      totalAmount.textContent = total.toFixed(2);
+      transactionFee.textContent = fee.toFixed(2);
+
+      // Update Current Price live
+      if (price > 0) {
+        currentPrice.textContent = "₹" + price.toFixed(2);
+      }
+    }
+
+    creditsInput.addEventListener("input", calculate);
+    priceInput.addEventListener("input", calculate);
+
+    // Project selection updates default price
+    projectSelect.addEventListener("change", () => {
+      if (projectSelect.value) {
+        priceInput.value = projectSelect.value;
+        calculate();
+      }
+    });
+
+    // Handle Form Submit
+    document.getElementById("marketForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const total = parseFloat(totalAmount.textContent) || 0;
+      const credits = parseFloat(creditsInput.value) || 0;
+
+      // Update stats
+      volumeValue += credits;
+      marketCapValue += total;
+      volume24h.textContent = volumeValue.toLocaleString();
+      marketCap.textContent = "₹" + (marketCapValue / 1000000).toFixed(1) + "M";
+
+      alert("✅ Order placed successfully!");
+      creditsInput.value = "";
+      calculate();
+    });
+  </script>
+
+  <script>
+    // Load navbar from external file
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+
+        // Highlight current page
+        const links = document.querySelectorAll("#navbar .nav-link");
+        links.forEach(link => {
+          if (link.getAttribute("href") === location.pathname.split("/").pop()) {
+            link.classList.add("active");
+          }
+        });
+      });
+  </script>
+
+</body>
+</html>

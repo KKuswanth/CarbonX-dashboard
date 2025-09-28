@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CarbonX Dashboard</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+   <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <!-- Navbar placeholder -->
+  <div id="navbar"></div>
+
+  <div class="container my-4">
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card p-3">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-tree-fill symbol"></i>
+            <div>
+              <div class="stat-value">2</div>
+              <div class="stat-label">Active Projects</div>
+              <div class="stat-change">+12% from last month</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-3">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-coin symbol text-warning"></i>
+            <div>
+              <div class="stat-value">1,301</div>
+              <div class="stat-label">Carbon Credits Issued</div>
+              <div class="stat-change">+8.2% this week</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-3">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-droplet-fill symbol text-info"></i>
+            <div>
+              <div class="stat-value">125</div>
+              <div class="stat-label">Mangrove Area (ha)</div>
+              <div class="stat-change">+15.7% expansion</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-3">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-people-fill symbol"></i>
+            <div>
+              <div class="stat-value">3</div>
+              <div class="stat-label">Community Impact</div>
+              <div class="stat-change">+ Communities supported</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mangrove Restoration Sites -->
+    <div class="card p-3 mb-4">
+      <h6 class="section-title"><i class="bi bi-tree"></i> Mangrove Restoration Sites</h6>
+      <img src="mangrove.jpg" class="w-100 rounded" alt="Mangrove Sites">
+    </div>
+
+    <!-- Recent Blockchain Transactions -->
+    <div class="card p-3 mb-4">
+      <h6 class="section-title"><i class="bi bi-currency-bitcoin"></i> Recent Blockchain Transactions</h6>
+      <div class="transaction d-flex justify-content-between">
+        <div><i class="bi bi-currency-bitcoin text-success"></i> Credit Issuance <small class="text-muted">Block #afb5a04a</small></div>
+        <div class="credit-green">+120 Credits <small class="text-muted">5 days ago</small></div>
+      </div>
+      <hr>
+      <a href="transactions.html" class="text-success fw-bold">View All Transactions →</a>
+    </div>
+
+    <!-- Carbon Credit Calculations -->
+    <div class="card p-3">
+      <h6 class="section-title"><i class="bi bi-calculator"></i> Carbon Credit Calculations</h6>
+      <div class="row text-center">
+        <div class="col-md-4">
+          <i class="bi bi-tree-fill text-success fs-3"></i>
+          <div class="stat-value">5,000</div>
+          <div class="stat-label">Mangrove Trees Planted</div>
+        </div>
+        <div class="col-md-4">
+          <i class="bi bi-cloud-check-fill text-primary fs-3"></i>
+          <div class="stat-value">1,301</div>
+          <div class="stat-label">Tons CO₂ Absorbed / Year</div>
+        </div>
+        <div class="col-md-4">
+          <i class="bi bi-coin text-warning fs-3"></i>
+          <div class="stat-value">1,301</div>
+          <div class="stat-label">Carbon Credits Earned</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Load Navbar dynamically -->
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+
+        // Highlight active page
+        const currentPage = location.pathname.split("/").pop();
+        document.querySelectorAll("#navbar .nav-link").forEach(link => {
+          if (link.getAttribute("href") === currentPage) {
+            link.classList.add("active");
+          }
+        });
+      });
+  </script>
+</body>
+</html>
