@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CarbonX Projects</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="fw-bold">Project Registration</h4>
+      <button class="btn btn-success" data-bs-toggle="collapse" data-bs-target="#newProjectForm">
+        + New Project
+      </button>
+    </div>
+
+    <div class="collapse" id="newProjectForm">
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Register New Restoration Site</h6>
+        <form id="projectForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Project Name *</label>
+              <input type="text" class="form-control" id="projectName" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Location *</label>
+              <input type="text" class="form-control" id="location" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Area (hectares)</label>
+              <input type="number" class="form-control" id="area">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Expected Trees</label>
+              <input type="number" class="form-control" id="trees">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Initial Credits</label>
+              <input type="number" class="form-control" id="credits" value="0" min="0">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-bold">Project Description *</label>
+              <textarea class="form-control" rows="3" id="description" required></textarea>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+            <button type="submit" class="btn btn-success">Submit for Review</button>
+          </div>
+          <div id="projectMessage" class="alert mt-3 d-none"></div>
+        </form>
+      </div>
+    </div>
+
+    <h5 class="fw-bold mb-3">Your Projects</h5>
+    <div class="row" id="projectList">
+      <p class="text-muted">Loading projects…</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    loadNavbar();
+
+    const projectForm = document.getElementById("projectForm");
+    const projectList = document.getElementById("projectList");
+    const projectMessage = document.getElementById("projectMessage");
+
+    function statusClass(status) {
+      const value = (status || "").toLowerCase();
+      if (value.includes("review")) return "status-review";
+      if (value.includes("active")) return "status-active";
+      return "status-active";
+    }
+
+    function renderProjects(projects) {
+      if (!projects.length) {
+        projectList.innerHTML = '<p class="text-muted">No projects yet. Create one above.</p>';
+        return;
+      }
+
+      projectList.innerHTML = projects.map((project) => `
+        <div class="col-md-4 mb-3">
+          <div class="card p-3">
+            <div class="d-flex justify-content-between">
+              <h6 class="fw-bold">${project.name}</h6>
+              <span class="status-badge ${statusClass(project.status)}">${project.status}</span>
+            </div>
+            <p class="text-muted small mb-1">Project #${project.id}</p>
+            <p class="mb-0 text-success fw-bold">Credits Earned: ${formatNumber(project.credits)}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function loadProjects() {
+      try {
+        const projects = await apiGet("/projects");
+        renderProjects(projects);
+      } catch (err) {
+        projectList.innerHTML = '<p class="text-danger">Could not load projects from API.</p>';
+      }
+    }
+
+    projectForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("projectName").value.trim();
+      const credits = Number(document.getElementById("credits").value || 0);
+
+      try {
+        await apiPost("/projects", {
+          name,
+          status: "Under Review",
+          credits,
+        });
+        projectMessage.className = "alert alert-success mt-3";
+        projectMessage.textContent = "Project saved to database.";
+        projectMessage.classList.remove("d-none");
+        projectForm.reset();
+        await loadProjects();
+      } catch (err) {
+        projectMessage.className = "alert alert-danger mt-3";
+        projectMessage.textContent = err.message || "Failed to save project.";
+        projectMessage.classList.remove("d-none");
+      }
+    });
+
+    loadProjects();
+  </script>
+</body>
+</html>

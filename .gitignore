@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Java / Spring Boot
+backend-java/target/
+backend-java/data/
+backend-java/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs / env
+*.log
+.env
+.env.*

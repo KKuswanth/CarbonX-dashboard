@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CarbonX | Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="container my-4">
+    <h5 class="fw-bold">Admin Panel</h5>
+    <p class="text-muted" id="platformInfo">Loading platform settings…</p>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="status-box status-pending"><i class="bi bi-hourglass-split me-2"></i> <span id="pendingCount">0</span> Pending Review</div>
+      </div>
+      <div class="col-md-3">
+        <div class="status-box status-approved"><i class="bi bi-check-circle-fill me-2"></i> <span id="approvedCount">0</span> Active</div>
+      </div>
+      <div class="col-md-3">
+        <div class="status-box status-rejected"><i class="bi bi-people-fill me-2"></i> <span id="userCount">0</span> Users</div>
+      </div>
+      <div class="col-md-3">
+        <div class="status-box status-reviewers"><i class="bi bi-gear-fill me-2"></i> <span id="platformVersion">—</span></div>
+      </div>
+    </div>
+
+    <div class="card p-3 mb-3">
+      <h6 class="fw-bold mb-3">Admin Users</h6>
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <tr><td colspan="3" class="text-muted">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card p-3 mb-3">
+      <h6 class="fw-bold mb-3">Projects</h6>
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Credits</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="projectsTableBody">
+          <tr><td colspan="4" class="text-muted">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3"><i class="bi bi-check2-circle text-success"></i> Platform Settings</h6>
+      <ul class="checklist" id="settingsList">
+        <li class="text-muted">Loading…</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    loadNavbar();
+
+    async function loadAdmin() {
+      try {
+        const [admin, projects] = await Promise.all([
+          apiGet("/admin"),
+          apiGet("/projects"),
+        ]);
+
+        const settings = admin.settings || {};
+        document.getElementById("platformInfo").textContent =
+          `${settings.platformName || "CarbonX"} · version ${settings.version || "—"}`;
+        document.getElementById("platformVersion").textContent = `v${settings.version || "—"}`;
+        document.getElementById("userCount").textContent = (admin.users || []).length;
+
+        const pending = projects.filter((p) => String(p.status).toLowerCase().includes("review")).length;
+        const active = projects.filter((p) => String(p.status).toLowerCase() === "active").length;
+        document.getElementById("pendingCount").textContent = pending;
+        document.getElementById("approvedCount").textContent = active;
+
+        document.getElementById("usersTableBody").innerHTML = (admin.users || []).map((u) => `
+          <tr>
+            <td>${u.id}</td>
+            <td>${u.name}</td>
+            <td>${u.role}</td>
+          </tr>
+        `).join("") || '<tr><td colspan="3">No users</td></tr>';
+
+        document.getElementById("projectsTableBody").innerHTML = projects.map((p) => `
+          <tr>
+            <td>${p.name}</td>
+            <td>${formatNumber(p.credits)}</td>
+            <td><span class="badge ${String(p.status).toLowerCase().includes("review") ? "bg-warning text-dark" : "bg-success"}">${p.status}</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" disabled>Review</button>
+            </td>
+          </tr>
+        `).join("") || '<tr><td colspan="4">No projects</td></tr>';
+
+        document.getElementById("settingsList").innerHTML = `
+          <li><i class="bi bi-check-circle-fill text-success"></i> Platform: ${settings.platformName}</li>
+          <li><i class="bi bi-check-circle-fill text-success"></i> Version: ${settings.version}</li>
+          <li><i class="bi bi-check-circle-fill text-success"></i> Connected to Java + SQL API</li>
+        `;
+      } catch (err) {
+        document.getElementById("platformInfo").textContent = "Could not load admin API.";
+        document.getElementById("usersTableBody").innerHTML =
+          '<tr><td colspan="3" class="text-danger">API unavailable</td></tr>';
+      }
+    }
+
+    loadAdmin();
+  </script>
+</body>
+</html>

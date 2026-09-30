@@ -151,6 +151,7 @@
   </div>
 
   <!-- Gauge Chart Scripts -->
+  <script src="js/api.js"></script>
   <script>
   // Custom plugin for center text
   const centerText = {
@@ -206,26 +207,57 @@
     });
   }
 
-  // Gauges
-  createGauge(document.getElementById("tempGauge"), 28.5, 50, "#0d6efd", "°C");
-  createGauge(document.getElementById("humidityGauge"), 78, 100, "#198754", "%");
-  createGauge(document.getElementById("phGauge"), 7.2, 14, "#20c997", "pH");
-  createGauge(document.getElementById("salinityGauge"), 3.2, 10, "#ffc107", "ppt");
-</script>
-<script>
-  fetch("navbar.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("navbar").innerHTML = data;
+  // Gauges will be filled from API
+  let gaugesReady = false;
 
-      // Highlight current page
-      const links = document.querySelectorAll("#navbar .nav-link");
-      links.forEach(link => {
-        if (link.getAttribute("href") === location.pathname.split("/").pop()) {
-          link.classList.add("active");
-        }
-      });
-    });
+  async function loadMonitoring() {
+    try {
+      const data = await apiGet("/monitoring");
+      const readings = data.sensorReadings || [];
+      const avgPh = readings.length
+        ? readings.reduce((sum, r) => sum + Number(r.ph || 0), 0) / readings.length
+        : 7.2;
+      const avgSalinity = readings.length
+        ? readings.reduce((sum, r) => sum + Number(r.salinity || 0), 0) / readings.length
+        : 0.35;
+
+      // Convert stored salinity (fraction) to ppt-like display for the gauge
+      const salinityPpt = Number((avgSalinity * 10).toFixed(1));
+
+      createGauge(document.getElementById("tempGauge"), 28.5, 50, "#0d6efd", "°C");
+      createGauge(document.getElementById("humidityGauge"), 78, 100, "#198754", "%");
+      createGauge(document.getElementById("phGauge"), Number(avgPh.toFixed(1)), 14, "#20c997", "pH");
+      createGauge(document.getElementById("salinityGauge"), salinityPpt, 10, "#ffc107", "ppt");
+
+      const map = document.querySelector(".iot-map");
+      if (map && readings.length) {
+        map.innerHTML = readings.map((r, i) => {
+          const colors = ["bg-success", "bg-primary", "bg-warning"];
+          const tops = ["40%", "65%", "30%"];
+          const lefts = ["20%", "55%", "70%"];
+          return `<div class="dot ${colors[i % colors.length]}" style="top:${tops[i % tops.length]}; left:${lefts[i % lefts.length]};" title="${r.site}"></div>`;
+        }).join("");
+      }
+
+      const legend = document.querySelector(".mt-2");
+      if (legend && readings.length) {
+        legend.innerHTML = readings.map((r, i) => {
+          const colors = ["bg-success", "bg-primary", "bg-warning"];
+          return `<span class="legend"><span class="dot ${colors[i % colors.length]} d-inline-block"></span> ${r.site}</span>`;
+        }).join(" | ");
+      }
+
+      gaugesReady = true;
+    } catch (err) {
+      createGauge(document.getElementById("tempGauge"), 28.5, 50, "#0d6efd", "°C");
+      createGauge(document.getElementById("humidityGauge"), 78, 100, "#198754", "%");
+      createGauge(document.getElementById("phGauge"), 7.2, 14, "#20c997", "pH");
+      createGauge(document.getElementById("salinityGauge"), 3.2, 10, "#ffc107", "ppt");
+    }
+  }
+
+  loadNavbar();
+  loadMonitoring();
 </script>
 
 </body>
